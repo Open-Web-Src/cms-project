@@ -1,5 +1,5 @@
-docker build -t cms-test -f apis/Dockerfile ./apis && \
-docker run --rm --env-file apis/.env.test cms-test npm run test; \
+set -e  # Exit immediately on build/test failure
 
-# ensures rmi runs no matter what.
-docker rmi cms-test || true
+docker build -t cms-test -f apis/Dockerfile ./apis
+docker run --rm --env-file apis/.env.test cms-test npm run test
+docker rmi cms-test || true  # Always run to clean up
