@@ -1,1 +1,5 @@
-npm run test
+docker build -t cms-test -f apis/Dockerfile ./apis && \
+docker run --rm --env-file apis/.env.test cms-test npm run test; \
+
+# ensures rmi runs no matter what.
+docker rmi cms-test || true
