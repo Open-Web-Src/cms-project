@@ -1,5 +1,7 @@
 set -e  # Exit immediately on build/test failure
 
-docker build -t cms-test -f apis/Dockerfile ./apis
-docker run --rm --env-file apis/.env.test cms-test npm run test
+docker build -t cms-test -f apis/Dockerfile ./apis && \
+docker run --rm \
+  --env-file apis/.env.test \
+  cms-test sh -c "npm run test && npm run test:e2e"; \
 docker rmi cms-test || true  # Always run to clean up
