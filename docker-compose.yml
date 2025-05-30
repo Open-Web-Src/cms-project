@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: cms-db
+    image: postgres:15
+    env_file:
+      - ./db/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+    networks:
+      app-network:
+        aliases:
+          - postgres.app.local
+
+  apis:
+    container_name: cms-apis
+    build:
+      context: ./apis
+    env_file:
+      - ./apis/.env
+    volumes:
+      - ./apis:/app
+      - apis_node_modules:/app/node_modules
+    working_dir: /app
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    networks:
+      app-network:
+        aliases:
+          - apis.app.local
+
+  web:
+    container_name: cms-web
+    build:
+      context: ./web
+      target: dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./web/.env
+    volumes:
+      - ./web:/app
+      - react_node_modules:/app/node_modules
+    working_dir: /app
+    command: npm run dev
+    depends_on:
+      - apis
+    networks:
+      app-network:
+        aliases:
+          - web.app.local
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  apis_node_modules:
+  react_node_modules:
